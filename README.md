@@ -2,17 +2,21 @@
 
 This project is an automated tool for publishing random comics from the XKCD website on the wall of a VKontakte group.
 
-### How to install
+### How to Install
 
-1. Clone the repository to your local computer.
-2. Install the necessary packages using `pip install -r requirements.txt` (assuming that you have a requirements.txt file with all dependencies).
+1. Clone the repository to your local computer using: `git clone https://github.com/yourusername/your-repo-name.git`
+2. Install the necessary packages using `pip install -r requirements.txt` (assuming you have a requirements.txt file with all dependencies).
 3. Create a `.env` file in the root directory of the project.
 4. Add the following variables to the `.env` file:
-    - `API_ID` - your VKontakte application ID.
-    - `ACCESS_TOKEN` - your access key for the VKontakte application.
+    - `API_ID` - your VKontakte app ID.
+    - `ACCESS_TOKEN` - your access key for the VKontakte app.
     - `USER_ID` - your VKontakte user ID.
-    - `GROUP_ID` - ID of the VKontakte group on whose wall the comics will be published.
-5. Run the script using the command `python main.py` in the command line.
+    - `GROUP_ID` - the VKontakte group ID, on the wall of which the comics will be published.
+
+### How to Run
+
+Run the script using the command: `python main.py`
+If everything was successful, you will see the following output: `Comix posted successfully!`
 
 ### Project Objective
 
