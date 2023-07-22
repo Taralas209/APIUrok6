@@ -88,6 +88,8 @@ def public_post_to_wall(group_id, access_token, saved_photo_info, comments):
     }
     vk_response = requests.post(vk_url, data=data)
     vk_response.raise_for_status()
+    if vk_response.status_code == 200:
+        print("Comix posted successfully!")
 
 
 
