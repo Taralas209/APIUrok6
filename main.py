@@ -18,16 +18,17 @@ def get_random_comic_and_download_image(last_comic_number):
     comic_response = requests.get(comic_url)
     comic_response.raise_for_status()
 
-    image_url = comic_response.json()['img']
-    comments = comic_response.json()['alt']
-    image_name = f"""comic_{random_comic_number}.jpg"""
+    comic_data = comic_response.json()
+    comic_image_url  = comic_data['img']
+    comic_comments = comic_data['alt']
+    comic_image_name = f"""comic_{random_comic_number}.jpg"""
 
-    image_response = requests.get(image_url)
+    image_response = requests.get(comic_image_url)
     image_response.raise_for_status()
 
-    with open(image_name, 'wb') as file:
+    with open(comic_image_name, 'wb') as file:
         file.write(image_response.content)
-    return image_name, comments
+    return comic_image_url, comic_comments
 
 
 def get_vk_server_url_to_upload_image(vk_group_id, vk_access_token):
