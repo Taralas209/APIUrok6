@@ -2,7 +2,6 @@ import os
 import random
 import requests
 from dotenv import load_dotenv
-from urllib.parse import urlencode
 
 
 def get_last_comic_number():
@@ -41,6 +40,7 @@ def get_vk_server_url_to_upload_image(vk_group_id, vk_access_token):
         'v': '5.131'
     }
     vk_response = requests.get(vk_url, params=params)
+    vk_response.raise_for_status()
     vk_server_upload_url = vk_response.json()['response']["upload_url"]
     return vk_server_upload_url
 
