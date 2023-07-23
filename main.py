@@ -4,13 +4,6 @@ import requests
 from dotenv import load_dotenv
 
 
-load_dotenv()
-api_id = os.getenv('API_ID')
-access_token = os.getenv('ACCESS_TOKEN')
-user_id = os.getenv('USER_ID')
-group_id = os.getenv('GROUP_ID')
-
-
 def get_last_comic_number():
     current_comic_url = 'https://xkcd.com/info.0.json'
     xkcd_response = requests.get(current_comic_url)
@@ -91,9 +84,11 @@ def public_post_to_wall(group_id, access_token, saved_photo_info, comments):
     if vk_response.status_code == 200:
         print("Comix posted successfully!")
 
+def main():
+    load_dotenv()
+    access_token = os.getenv('ACCESS_TOKEN')
+    group_id = os.getenv('GROUP_ID')
 
-
-if __name__ == "__main__":
     last_comic_number = get_last_comic_number()
     image_name, comments = fetch_comic_info(last_comic_number)
     upload_url = get_vk_upload_id(group_id, access_token)
@@ -101,4 +96,7 @@ if __name__ == "__main__":
     saved_photo_info = save_photo_to_vk_wall(group_id, access_token, upload_result)
     result = public_post_to_wall(group_id, access_token, saved_photo_info, comments)
 
+
+if __name__ == "__main__":
+    main()
 
