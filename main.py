@@ -54,7 +54,6 @@ def upload_photo_to_vk_server(vk_server_upload_url, image_name):
     vk_response = requests.post(vk_server_upload_url, files=files)
     vk_response.raise_for_status()
     upload_result = vk_response.json()
-    os.remove(image_name)
     return upload_result
 
 
@@ -101,6 +100,7 @@ def main():
     image_name, comments = get_random_comic_and_download_image(last_comic_number)
     vk_server_upload_url = get_vk_server_url_to_upload_image(vk_group_id, vk_access_token)
     upload_result = upload_photo_to_vk_server(vk_server_upload_url, image_name)
+    os.remove(image_name)
     saved_photo_info = save_photo_to_vk_wall(vk_group_id, vk_access_token, upload_result)
     result = public_post_to_wall(vk_group_id, vk_access_token, saved_photo_info, comments)
 
