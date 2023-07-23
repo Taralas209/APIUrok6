@@ -12,7 +12,7 @@ def get_last_comic_number():
     return last_comic_number
 
 
-def fetch_comic_info(last_comic_number):
+def get_random_comic_and_download_image(last_comic_number):
     random_comic_number = random.randint(1, last_comic_number)
     comic_url = f"""https://xkcd.com/{random_comic_number}/info.0.json"""
     comic_response = requests.get(comic_url)
@@ -30,20 +30,20 @@ def fetch_comic_info(last_comic_number):
     return image_name, comments
 
 
-def get_vk_upload_id(vk_group_id, vk_access_token):
+def get_vk_server_url_to_upload_image(vk_group_id, vk_access_token):
     method = 'photos.getWallUploadServer'
     vk_url = f'''https://api.vk.com/method/{method}?group_id={vk_group_id}&access_token={vk_access_token}&v=5.131'''
     vk_response = requests.get(vk_url)
-    upload_id = vk_response.json()['response']["upload_url"]
-    return upload_id
+    vk_server_upload_url = vk_response.json()['response']["upload_url"]
+    return vk_server_upload_url
 
 
-def upload_photo_to_vk_server(upload_url, image_name):
+def upload_photo_to_vk_server(vk_server_upload_url, image_name):
     with open(image_name, 'rb') as file:
         files = {
             'photo': file,
         }
-        vk_response = requests.post(upload_url, files=files)
+        vk_response = requests.post(vk_server_upload_url, files=files)
         vk_response.raise_for_status()
         upload_result = vk_response.json()
     os.remove(image_name)
@@ -90,9 +90,9 @@ def main():
     vk_group_id = os.getenv('VK_GROUP_ID')
 
     last_comic_number = get_last_comic_number()
-    image_name, comments = fetch_comic_info(last_comic_number)
-    upload_url = get_vk_upload_id(vk_group_id, vk_access_token)
-    upload_result = upload_photo_to_vk_server(upload_url, image_name)
+    image_name, comments = get_random_comic_and_download_image(last_comic_number)
+    vk_server_upload_url = get_vk_server_url_to_upload_image(vk_group_id, vk_access_token)
+    upload_result = upload_photo_to_vk_server(vk_server_upload_url, image_name)
     saved_photo_info = save_photo_to_vk_wall(vk_group_id, vk_access_token, upload_result)
     result = public_post_to_wall(vk_group_id, vk_access_token, saved_photo_info, comments)
 
