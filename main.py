@@ -46,12 +46,14 @@ def get_vk_server_url_to_upload_image(vk_group_id, vk_access_token):
 
 def upload_photo_to_vk_server(vk_server_upload_url, image_name):
     with open(image_name, 'rb') as file:
-        files = {
-            'photo': file,
-        }
-        vk_response = requests.post(vk_server_upload_url, files=files)
-        vk_response.raise_for_status()
-        upload_result = vk_response.json()
+        file_data = file.read()
+
+    files = {
+        'photo': file_data,
+    }
+    vk_response = requests.post(vk_server_upload_url, files=files)
+    vk_response.raise_for_status()
+    upload_result = vk_response.json()
     os.remove(image_name)
     return upload_result
 
