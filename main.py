@@ -2,6 +2,7 @@ import os
 import random
 import requests
 from dotenv import load_dotenv
+from urllib.parse import urlencode
 
 
 def get_last_comic_number():
@@ -33,11 +34,15 @@ def get_random_comic_and_download_image(last_comic_number):
 
 def get_vk_server_url_to_upload_image(vk_group_id, vk_access_token):
     method = 'photos.getWallUploadServer'
-    vk_url = f'''https://api.vk.com/method/{method}?group_id={vk_group_id}&access_token={vk_access_token}&v=5.131'''
-    vk_response = requests.get(vk_url)
+    vk_url = f'https://api.vk.com/method/{method}'
+    params = {
+        'group_id': vk_group_id,
+        'access_token': vk_access_token,
+        'v': '5.131'
+    }
+    vk_response = requests.get(vk_url, params=params)
     vk_server_upload_url = vk_response.json()['response']["upload_url"]
     return vk_server_upload_url
-
 
 def upload_photo_to_vk_server(vk_server_upload_url, image_name):
     with open(image_name, 'rb') as file:
