@@ -19,7 +19,7 @@ def get_random_comic_and_download_image(last_comic_number):
     comic_response.raise_for_status()
 
     comic_data = comic_response.json()
-    comic_image_url  = comic_data['img']
+    comic_image_url = comic_data['img']
     comic_comments = comic_data['alt']
     comic_image_name = f"""comic_{random_comic_number}.jpg"""
 
@@ -75,7 +75,7 @@ def save_photo_to_vk_wall(vk_group_id, vk_access_token, upload_result):
 
 
 
-def public_post_to_wall(vk_group_id, vk_access_token, saved_photo_info, comments):
+def public_post_to_vk_group_wall(vk_group_id, vk_access_token, saved_photo_info, comments):
     method = 'wall.post'
     vk_url = f'''https://api.vk.com/method/{method}'''
     attachments = f"photo{saved_photo_info['response'][0]['owner_id']}_{saved_photo_info['response'][0]['id']}"
