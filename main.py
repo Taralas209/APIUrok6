@@ -31,6 +31,12 @@ def get_random_comic_and_download_image(last_comic_number):
         file.write(image_response.content)
     return comic_image_name, comic_comments
 
+def check_vk_response(response):
+    response_json = response.json()
+    if 'error' in response_json:
+        error_message = response_json['error'].get('error_msg', 'Unknown error')
+        error_code = response_json['error'].get('error_code', 'Unknown error code')
+        raise requests.HTTPError(f'VK API responded with an error code {error_code}: {error_message}')
 
 def get_vk_server_url_to_upload_image(vk_group_id, vk_access_token):
     method = 'photos.getWallUploadServer'
@@ -41,7 +47,7 @@ def get_vk_server_url_to_upload_image(vk_group_id, vk_access_token):
         'v': '5.131'
     }
     vk_response = requests.get(vk_url, params=params)
-    vk_response.raise_for_status()
+    check_vk_response(vk_response)
     vk_server_upload_url = vk_response.json()['response']["upload_url"]
     return vk_server_upload_url
 
@@ -51,7 +57,7 @@ def upload_photo_to_vk_server(vk_server_upload_url, comic_image_name):
             'photo': file,
         }
         vk_response = requests.post(vk_server_upload_url, files=files)
-    vk_response.raise_for_status()
+    check_vk_response(vk_response)
     uploaded_vk_server_parameters = vk_response.json()
     uploaded_photo_parameters = uploaded_vk_server_parameters['photo']
     uploaded_server = uploaded_vk_server_parameters['server']
@@ -71,7 +77,7 @@ def save_photo_to_vk_wall(vk_group_id, vk_access_token, uploaded_photo_parameter
         "hash": uploaded_hash,
     }
     vk_response = requests.post(vk_url, data=data)
-    vk_response.raise_for_status()
+    check_vk_response(vk_response)
     saved_photo_details = vk_response.json()['response'][0]
     saved_photo_owner_id = saved_photo_details['owner_id']
     saved_photo_id = saved_photo_details['id']
@@ -91,7 +97,7 @@ def public_post_to_vk_group_wall(vk_group_id, vk_access_token, saved_photo_owner
         "message": comments
     }
     vk_response = requests.post(vk_url, data=data)
-    vk_response.raise_for_status()
+    check_vk_response(vk_response)
     if vk_response.status_code == 200:
         print("Comix posted successfully!")
 
@@ -101,10 +107,15 @@ def main():
     vk_group_id = os.getenv('VK_GROUP_ID')
 
     last_comic_number = get_last_comic_number()
-    comic_image_name, comic_comments = get_random_comic_and_download_image(last_comic_number)
     vk_server_upload_url = get_vk_server_url_to_upload_image(vk_group_id, vk_access_token)
-    uploaded_photo_parameters, uploaded_server, uploaded_hash = upload_photo_to_vk_server(vk_server_upload_url, comic_image_name)
-    os.remove(comic_image_name)
+
+    try:
+        comic_image_name, comic_comments = get_random_comic_and_download_image(last_comic_number)
+        uploaded_photo_parameters, uploaded_server, uploaded_hash = upload_photo_to_vk_server(vk_server_upload_url, comic_image_name)
+    finally:
+        if os.path.exists(comic_image_name):
+            os.remove(comic_image_name)
+
     saved_photo_owner_id, saved_photo_id = save_photo_to_vk_wall(vk_group_id, vk_access_token, uploaded_photo_parameters, uploaded_server, uploaded_hash)
     public_post_to_vk_group_wall(vk_group_id, vk_access_token, saved_photo_owner_id, saved_photo_id, comic_comments)
 
