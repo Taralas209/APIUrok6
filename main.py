@@ -13,7 +13,7 @@ def get_last_comic_number():
     return last_comic_number
 
 
-def get_random_comic_and_download_image(last_comic_number):
+def download_random_comic(last_comic_number):
     random_comic_number = random.randint(1, last_comic_number)
     comic_url = f"""https://xkcd.com/{random_comic_number}/info.0.json"""
     comic_response = requests.get(comic_url)
@@ -32,13 +32,13 @@ def get_random_comic_and_download_image(last_comic_number):
     return comic_image_name, comic_comments
 
 def check_vk_response(response):
-    response_json = response.json()
-    if 'error' in response_json:
-        error_message = response_json['error'].get('error_msg', 'Unknown error')
-        error_code = response_json['error'].get('error_code', 'Unknown error code')
+    vk_response = response.json()
+    if 'error' in vk_response:
+        error_message = vk_response['error'].get('error_msg', 'Unknown error')
+        error_code = vk_response['error'].get('error_code', 'Unknown error code')
         raise requests.HTTPError(f'VK API responded with an error code {error_code}: {error_message}')
 
-def get_vk_server_url_to_upload_image(vk_group_id, vk_access_token):
+def get_upload_url(vk_group_id, vk_access_token):
     method = 'photos.getWallUploadServer'
     vk_url = f'https://api.vk.com/method/{method}'
     params = {
@@ -107,10 +107,10 @@ def main():
     vk_group_id = os.getenv('VK_GROUP_ID')
 
     last_comic_number = get_last_comic_number()
-    vk_server_upload_url = get_vk_server_url_to_upload_image(vk_group_id, vk_access_token)
+    vk_server_upload_url = get_upload_url(vk_group_id, vk_access_token)
 
     try:
-        comic_image_name, comic_comments = get_random_comic_and_download_image(last_comic_number)
+        comic_image_name, comic_comments = download_random_comic(last_comic_number)
         uploaded_photo_parameters, uploaded_server, uploaded_hash = upload_photo_to_vk_server(vk_server_upload_url, comic_image_name)
     finally:
         if os.path.exists(comic_image_name):
