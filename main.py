@@ -30,12 +30,14 @@ def download_random_comic(last_comic_number):
         file.write(image_response.content)
     return comic_image_name, comic_comments
 
+
 def check_vk_response(response):
     vk_response = response.json()
     if 'error' in vk_response:
         error_message = vk_response['error'].get('error_msg', 'Unknown error')
         error_code = vk_response['error'].get('error_code', 'Unknown error code')
         raise requests.HTTPError(f'VK API responded with an error code {error_code}: {error_message}')
+
 
 def get_upload_url(vk_group_id, vk_access_token):
     method = 'photos.getWallUploadServer'
@@ -49,6 +51,7 @@ def get_upload_url(vk_group_id, vk_access_token):
     check_vk_response(vk_response)
     vk_server_upload_url = vk_response.json()['response']["upload_url"]
     return vk_server_upload_url
+
 
 def upload_photo_to_vk_server(vk_server_upload_url, comic_image_name):
     with open(comic_image_name, 'rb') as file:
@@ -83,7 +86,6 @@ def save_photo_to_vk_wall(vk_group_id, vk_access_token, uploaded_photo_parameter
     return saved_photo_owner_id, saved_photo_id
 
 
-
 def publish_post_to_vk_group_wall(vk_group_id, vk_access_token, saved_photo_owner_id, saved_photo_id, comments):
     method = 'wall.post'
     vk_url = f'''https://api.vk.com/method/{method}'''
@@ -98,6 +100,7 @@ def publish_post_to_vk_group_wall(vk_group_id, vk_access_token, saved_photo_owne
     vk_response = requests.post(vk_url, data=data)
     check_vk_response(vk_response)
     return vk_response.ok
+
 
 def main():
     load_dotenv()
@@ -120,6 +123,7 @@ def main():
         print("Comix posted successfully!")
     else:
         print("Failed to post the comic.")
+
 
 if __name__ == "__main__":
     main()
