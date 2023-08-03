@@ -97,8 +97,7 @@ def publish_post_to_vk_group_wall(vk_group_id, vk_access_token, saved_photo_owne
     }
     vk_response = requests.post(vk_url, data=data)
     check_vk_response(vk_response)
-    if vk_response.status_code == 200:
-        print("Comix posted successfully!")
+    return vk_response.ok
 
 def main():
     load_dotenv()
@@ -116,8 +115,11 @@ def main():
             os.remove(comic_image_name)
 
     saved_photo_owner_id, saved_photo_id = save_photo_to_vk_wall(vk_group_id, vk_access_token, uploaded_photo_parameters, uploaded_server, uploaded_hash)
-    publish_post_to_vk_group_wall(vk_group_id, vk_access_token, saved_photo_owner_id, saved_photo_id, comic_comments)
-
+    post_successful = publish_post_to_vk_group_wall(vk_group_id, vk_access_token, saved_photo_owner_id, saved_photo_id, comic_comments)
+    if post_successful:
+        print("Comix posted successfully!")
+    else:
+        print("Failed to post the comic.")
 
 if __name__ == "__main__":
     main()
